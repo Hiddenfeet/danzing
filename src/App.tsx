@@ -45,7 +45,7 @@ const colors = {
 } as const;
 
 export default function Home() {
-  const contractQuery = useContract(contractAddress);
+  const contractQuery = useContract("0xf601FfEA6A76E83921750361E613d82286c4Ad9B");
   const contractMetadata = useContractMetadata(contractQuery.contract);
   const { toast } = useToast();
   const theme = (urlParams.get("theme") || themeConst || "light") as

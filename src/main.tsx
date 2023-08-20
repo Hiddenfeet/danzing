@@ -1,38 +1,55 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
 import { ThirdwebProvider } from "@thirdweb-dev/react";
-import "./styles/globals.css";
-import { Toaster } from "./components/ui/Toaster";
-import { getGasless } from "./utils/getGasless";
-import {
-  biconomyApiIdConst,
-  biconomyApiKeyConst,
-  chainConst,
-  relayerUrlConst,
-  clientIdConst,
-} from "./consts/parameters";
+import type { AppProps } from "next/app";
+import { ChakraProvider, extendTheme, Box } from "@chakra-ui/react";
 
-const container = document.getElementById("root");
-const root = createRoot(container!);
-const urlParams = new URL(window.location.toString()).searchParams;
+import Head from "next/head";
+import { metamaskWallet, walletConnect,  coinbaseWallet, } from "@thirdweb-dev/react";
+import { Cronos } from "@thirdweb-dev/chains";
 
-const relayerUrl = urlParams.get("relayUrl") || relayerUrlConst || "";
-const biconomyApiKey =
-  urlParams.get("biconomyApiKey") || biconomyApiKeyConst || "";
-const biconomyApiId =
-  urlParams.get("biconomyApiId") || biconomyApiIdConst || "";
-const sdkOptions = getGasless(relayerUrl, biconomyApiKey, biconomyApiId);
+const backgroundImageUrl = "https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FZJfSFFhhW976mSbeZcwH%2Fuploads%2FktzIUIk8OL3EISSe8yoN%2F484.png?alt=media&token=5e50345e-fb66-4272-81bd-1f2642fff1e1"; // Replace with the actual background image URL
 
-const chain = (urlParams.get("chain") && urlParams.get("chain")?.startsWith("{")) ? JSON.parse(String(urlParams.get("chain"))) : urlParams.get("chain") || chainConst;
+const theme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        background: `url(${backgroundImageUrl}) no-repeat fixed center center`, // Set the background image URL here
+        backgroundSize: "cover",
+      },
+    },
+  },
+});
 
-const clientId = urlParams.get("clientId") || clientIdConst || "";
 
-root.render(
-  <React.StrictMode>
-    <ThirdwebProvider activeChain={chain} sdkOptions={sdkOptions} clientId={clientId}>
-      <Toaster />
-      <App />
+const activeChain = "Cronos";
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <ThirdwebProvider
+      supportedWallets={[
+        walletConnect(),
+        metamaskWallet(),
+        coinbaseWallet(), 
+      ]}
+      activeChain={Cronos}
+      clientId={process.env.TW_CLIENT_ID}
+    >
+      <ChakraProvider theme={theme}>
+        <Head>
+          {/* Add your custom text here */}
+          <title>Tipsy Babes NFT Staking</title>
+        </Head>
+        {/* Wrap the background image with the Box component */}
+        <Box
+          w="100%"
+          h="100vh"
+          _hover={{
+            background: "hsl(243, 4.9%, 18.8%)",
+          }}
+        >
+          <Component {...pageProps} />
+        </Box>
+      </ChakraProvider>
     </ThirdwebProvider>
-  </React.StrictMode>,
-);
+  );
+}
+
+export default MyApp;
